@@ -12,7 +12,7 @@ const CanvasContent = (props) => {
         }
 
         context.fillStyle = '#ffffff';
-        context.font = '300 32px helvetica';
+        context.font = '300 42px helvetica';
         let lines = [];
         const newLines = props.contentContent.split('\n');
         for (let line = 0; line < newLines.length; line++) {
@@ -21,7 +21,7 @@ const CanvasContent = (props) => {
         }
 
         for (let i = 0; i < lines.length; i++) {
-            const lineHeight = i * 45;
+            const lineHeight = i * 55;
             context.fillText(lines[i], 90, 250 + lineHeight);
         }
 
