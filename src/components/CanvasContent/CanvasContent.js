@@ -20,6 +20,9 @@ const CanvasContent = (props) => {
             lines = [...lines, ...parsed];
         }
 
+        if (lines.length > 14) props.setIsContentButtonDisabled(true);
+        else props.setIsContentButtonDisabled(false);
+
         for (let i = 0; i < lines.length; i++) {
             const lineHeight = i * 55;
             context.fillText(lines[i], 90, 250 + lineHeight);
@@ -28,7 +31,7 @@ const CanvasContent = (props) => {
         context.font = '700 32px helvetica';
         const leftPadding = (280 - context.measureText(props.contentCategory).width) / 2;
         context.fillText(props.contentCategory, 270 + leftPadding, 122);
-    }, [props.contentContent, props.contentCategory, props.contentFrame]);
+    }, [props.contentContent, props.contentCategory, props.contentFrame, props.setIsContentButtonDisabled]);
 
     const getLines = (context, text, maxWidth) => {
         var words = text.split(' ');

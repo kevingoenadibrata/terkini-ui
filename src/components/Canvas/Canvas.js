@@ -43,10 +43,19 @@ const Canvas = (props) => {
             context.fillText(titleLines[i], 80, 830 + lineHeight);
         }
 
+        if (titleLines.length > 3) props.setIsTitleButtonDisabled(true);
+        else props.setIsTitleButtonDisabled(false);
+
         context.font = '700 32px helvetica';
         const leftPadding = (280 - context.measureText(props.contentCategory).width) / 2;
         context.fillText(props.contentCategory, 270 + leftPadding, 122);
-    }, [props.contentTitle, props.contentImage, props.contentCategory, props.contentFrame]);
+    }, [
+        props.contentTitle,
+        props.contentImage,
+        props.contentCategory,
+        props.contentFrame,
+        props.setIsTitleButtonDisabled
+    ]);
 
     const getLines = (context, text, maxWidth) => {
         var words = text.split(' ');

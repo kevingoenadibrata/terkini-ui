@@ -41,3 +41,13 @@ code {
 canvas {
     margin: 8px;
 }
+
+.warning {
+    color: #d0342c;
+}
+
+button {
+    margin-right: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+}
