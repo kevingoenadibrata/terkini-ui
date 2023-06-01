@@ -12,11 +12,12 @@ const fetchImages = async (query) => {
 
   const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${query}&searchType=image&num=${num}`;
 
-  console.log("url to fetch image:", url);
-
   try {
     const response = await fetch(url);
     const data = await response.json();
+
+    console.log("response from google:", data);
+
     const images = data.items;
     return images.map((image) => image.link);
   } catch (e) {
@@ -81,7 +82,7 @@ const Post = () => {
   useEffect(() => {
     const getImages = async () => {
       // TODO: Re-enable true fetching. Use mock data for now.
-      //   const images = await fetchImages(imageQuery);
+      // const images = await fetchImages(imageQuery);
 
       const images = [
         "https://img2.beritasatu.com/cache/jakartaglobe/525x375-3/2023/05/1683987025-910x580.webp",
@@ -96,13 +97,17 @@ const Post = () => {
   }, [imageQuery]);
 
   const handleImageUpload = (e) => {
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.onload = function (event) {
       const img = new Image();
       img.src = event.target.result;
       setImage(img);
     };
-    reader.readAsDataURL(e.target.files[0]);
+    try {
+      reader.readAsDataURL(e.target.files[0]);
+    } catch (e) {
+      console.error("error uploading image", e);
+    }
   };
 
   const handleDownload = (id) => {
@@ -112,8 +117,10 @@ const Post = () => {
     link.click();
   };
 
-  const handleSuggestedImageClick = (image) => {
+  // Set selected image to state and prepare image for canvas
+  const handleImageSelect = (image) => {
     const img = new Image();
+    img.crossOrigin = "anonymous";
     img.src = image;
     setImage(img);
   };
@@ -169,13 +176,17 @@ const Post = () => {
           }}
         >
           {suggestedImages.map((image, index) => (
-            <div key={index} style={{ margin: "10px" }}>
+            <div
+              key={index}
+              style={{ margin: "10px", cursor: "pointer" }}
+              onClick={() => handleImageSelect(image)}
+            >
               <img
                 src={image}
+                crossOrigin="anonymous"
                 alt="suggested"
                 width="200"
                 height="200"
-                onClick={() => handleSuggestedImageClick(image)}
               />
             </div>
           ))}
