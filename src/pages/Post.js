@@ -8,15 +8,13 @@ const fetchImages = async (query) => {
   // Get keys from .env file
   const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
   const cx = process.env.REACT_APP_GOOGLE_CX_KEY;
-  const num = 4;
+  const num = 8;
 
   const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${query}&searchType=image&num=${num}`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
-
-    console.log("response from google:", data);
 
     const images = data.items;
     return images.map((image) => image.link);
@@ -81,18 +79,15 @@ const Post = () => {
 
   useEffect(() => {
     const getImages = async () => {
-      // TODO: Re-enable true fetching. Use mock data for now.
-      // const images = await fetchImages(imageQuery);
-
-      const images = [
-        "https://img2.beritasatu.com/cache/jakartaglobe/525x375-3/2023/05/1683987025-910x580.webp",
-        "https://img.i-scmp.com/cdn-cgi/image/fit=contain,width=425,format=auto/sites/default/files/styles/768x768/public/d8/images/canvas/2023/04/21/ad214ab0-e429-4285-b757-2a87b2314986_293e5396.jpg?itok=9Nemd40M&v=1682060297",
-        "https://www.ft.com/__origami/service/image/v2/images/raw/https%253A%252F%252Fs3-ap-northeast-1.amazonaws.com%252Fpsh-ex-ftnikkei-3937bb4%252Fimages%252F9%252F8%252F2%252F8%252F44048289-1-eng-GB%252F2016-11-22T120000Z_1231810518_S1AEUOHKZFAA_RTRMADP_3_INDONESIA-NETHERLANDS.jpg?width=700&fit=cover&gravity=faces&dpr=2&quality=medium&source=nar-cms",
-        "https://img.i-scmp.com/cdn-cgi/image/fit=contain,width=1098,format=auto/sites/default/files/styles/1200x800/public/d8/images/canvas/2023/04/21/ad214ab0-e429-4285-b757-2a87b2314986_293e5396.jpg?itok=WEAkVVNq&v=1682060297",
-      ];
-
+      const images = await fetchImages(imageQuery);
       setSuggestedImages(images);
     };
+
+    // Skip fetching if imageQuery is empty
+    if (!imageQuery) {
+      return;
+    }
+
     getImages();
   }, [imageQuery]);
 
