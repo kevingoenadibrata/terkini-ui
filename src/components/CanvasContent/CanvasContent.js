@@ -1,27 +1,28 @@
 import React, { useRef, useEffect } from 'react';
 
 const CanvasContent = (props) => {
+    const { contentContent, contentFrame, contentCategory, setIsContentButtonDisabled } = props
     const canvasRef = useRef(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
-        if (props.contentFrame) {
-            context.drawImage(props.contentFrame, 0, 0, 1080, 1080);
+        if (contentFrame) {
+            context.drawImage(contentFrame, 0, 0, 1080, 1080);
         }
 
         context.fillStyle = '#ffffff';
         context.font = '300 42px helvetica';
         let lines = [];
-        const newLines = props.contentContent.split('\n');
+        const newLines = contentContent.split('\n');
         for (let line = 0; line < newLines.length; line++) {
             const parsed = getLines(context, newLines[line], 900);
             lines = [...lines, ...parsed];
         }
 
-        if (lines.length > 14) props.setIsContentButtonDisabled(true);
-        else props.setIsContentButtonDisabled(false);
+        if (lines.length > 14) setIsContentButtonDisabled(true);
+        else setIsContentButtonDisabled(false);
 
         for (let i = 0; i < lines.length; i++) {
             const lineHeight = i * 55;
@@ -29,9 +30,9 @@ const CanvasContent = (props) => {
         }
 
         context.font = '700 32px helvetica';
-        const leftPadding = (280 - context.measureText(props.contentCategory).width) / 2;
-        context.fillText(props.contentCategory, 270 + leftPadding, 122);
-    }, [props.contentContent, props.contentCategory, props.contentFrame, props.setIsContentButtonDisabled]);
+        const leftPadding = (280 - context.measureText(contentCategory).width) / 2;
+        context.fillText(contentCategory, 270 + leftPadding, 122);
+    }, [contentContent, contentCategory, contentFrame, setIsContentButtonDisabled]);
 
     const getLines = (context, text, maxWidth) => {
         var words = text.split(' ');
