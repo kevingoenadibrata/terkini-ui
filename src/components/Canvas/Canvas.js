@@ -1,15 +1,16 @@
 import React, { useRef, useEffect } from 'react';
 
 const Canvas = (props) => {
+    const { contentImage, contentFrame, contentTitle, contentCategory, setIsTitleButtonDisabled } = props
     const canvasRef = useRef(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
-        if (props.contentImage) {
-            let loadedImageWidth = props.contentImage.width;
-            let loadedImageHeight = props.contentImage.height;
+        if (contentImage) {
+            let loadedImageWidth = contentImage.width;
+            let loadedImageHeight = contentImage.height;
             // get the scale
             // it is the min of the 2 ratios
             let scaleFactor = Math.max(canvas.width / loadedImageWidth, canvas.height / loadedImageHeight);
@@ -25,36 +26,36 @@ const Canvas = (props) => {
 
             // When drawing the image, we have to scale down the image
             // width and height in order to fit within the canvas
-            context.drawImage(props.contentImage, x, y, newWidth, newHeight);
+            context.drawImage(contentImage, x, y, newWidth, newHeight);
         } else {
             context.fillStyle = '#000000';
             context.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        if (props.contentFrame) {
-            context.drawImage(props.contentFrame, 0, 0, 1080, 1080);
+        if (contentFrame) {
+            context.drawImage(contentFrame, 0, 0, 1080, 1080);
         }
 
         context.fillStyle = '#ffffff';
         context.font = '700 58px helvetica';
-        const titleLines = getLines(context, props.contentTitle, 950);
+        const titleLines = getLines(context, contentTitle, 950);
         for (let i = 0; i < titleLines.length; i++) {
             const lineHeight = i * 70;
             context.fillText(titleLines[i], 80, 830 + lineHeight);
         }
 
-        if (titleLines.length > 3) props.setIsTitleButtonDisabled(true);
-        else props.setIsTitleButtonDisabled(false);
+        if (titleLines.length > 3) setIsTitleButtonDisabled(true);
+        else setIsTitleButtonDisabled(false);
 
         context.font = '700 32px helvetica';
-        const leftPadding = (280 - context.measureText(props.contentCategory).width) / 2;
-        context.fillText(props.contentCategory, 270 + leftPadding, 122);
+        const leftPadding = (280 - context.measureText(contentCategory).width) / 2;
+        context.fillText(contentCategory, 270 + leftPadding, 122);
     }, [
-        props.contentTitle,
-        props.contentImage,
-        props.contentCategory,
-        props.contentFrame,
-        props.setIsTitleButtonDisabled
+        contentTitle,
+        contentImage,
+        contentCategory,
+        contentFrame,
+        setIsTitleButtonDisabled
     ]);
 
     const getLines = (context, text, maxWidth) => {
