@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 import Canvas from "../../components/Canvas/Canvas";
 import CanvasContent from "../../components/CanvasContent/CanvasContent";
@@ -77,12 +79,30 @@ const Post = () => {
     }
   };
 
-  const handleDownload = (id) => {
-    const link = document.createElement("a");
-    link.download = "cover.png";
-    link.href = document.getElementById(id).toDataURL();
-    link.click();
-  };
+  const handleDownload = useCallback(async () => {
+    setIsTitleButtonDisabled(true);
+    setIsContentButtonDisabled(true);
+
+    const zip = new JSZip();
+    const coverCanvas = document.getElementById("canvas-cover");
+    const contentCanvas = document.getElementById("canvas-content");
+
+    const coverBlob = await new Promise((resolve) =>
+      coverCanvas.toBlob(resolve, "image/png")
+    );
+    const contentBlob = await new Promise((resolve) =>
+      contentCanvas.toBlob(resolve, "image/png")
+    );
+
+    zip.file("cover.png", coverBlob);
+    zip.file("content.png", contentBlob);
+
+    zip.generateAsync({ type: "blob" }).then((blob) => {
+      saveAs(blob, "download.zip");
+      setIsTitleButtonDisabled(false);
+      setIsContentButtonDisabled(false);
+    });
+  }, []);
 
   // Set selected image to state and prepare image for canvas
   const handleImageSelect = (image) => {
@@ -196,17 +216,8 @@ const Post = () => {
       </div>
 
       <div className="groupInput">
-        <button
-          disabled={isTitleButtonDisabled}
-          onClick={() => handleDownload("canvas-cover")}
-        >
-          Download Cover
-        </button>
-        <button
-          disabled={isContentButtonDisabled}
-          onClick={() => handleDownload("canvas-content")}
-        >
-          Download Content
+        <button disabled={isTitleButtonDisabled} onClick={handleDownload}>
+          Download Cover & Content
         </button>
       </div>
       <div className="groupInput">
