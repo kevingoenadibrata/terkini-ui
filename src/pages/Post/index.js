@@ -1,39 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import Canvas from "../components/Canvas/Canvas";
-import CanvasContent from "../components/CanvasContent/CanvasContent";
-
-const fetchImages = async (query) => {
-  // Get keys from .env file
-  const apiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-  const cx = process.env.REACT_APP_GOOGLE_CX_KEY;
-  const num = 8;
-
-  const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${query}&searchType=image&num=${num}`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-
-    const images = data.items;
-    return images.map((image) => image.link);
-  } catch (e) {
-    console.error("Error fetching images:", e);
-    return [];
-  }
-};
-
-const fetchPost = async (postId) => {
-  try {
-    const response = await fetch(`https://terkiniai.fly.dev/posts/${postId}`);
-    const data = await response.json();
-    return data;
-  } catch (e) {
-    console.error("Error fetching posts:", e);
-    return null;
-  }
-};
+import Canvas from "../../components/Canvas/Canvas";
+import CanvasContent from "../../components/CanvasContent/CanvasContent";
+import { addNewlineOnPeriod, fetchImages, fetchPost } from "./lib";
 
 const Post = () => {
   const { postId } = useParams();
@@ -41,6 +11,7 @@ const Post = () => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
+  const [caption, setCaption] = useState("");
   const [image, setImage] = useState(null);
   const [imageQuery, setImageQuery] = useState("");
   const [suggestedImages, setSuggestedImages] = useState([]);
@@ -51,11 +22,11 @@ const Post = () => {
 
   useEffect(() => {
     const img = new Image();
-    img.src = require("../components/Canvas/Cover.png");
+    img.src = require("../../components/Canvas/Cover.png");
     setFrame(img);
 
     const img2 = new Image();
-    img2.src = require("../components/CanvasContent/Frame2.png");
+    img2.src = require("../../components/CanvasContent/Frame2.png");
     setFrame2(img2);
   }, []);
 
@@ -70,6 +41,7 @@ const Post = () => {
       // Set data according to fetched data
       setTitle(data.title);
       setContent(data.content);
+      setCaption(data.caption);
       setCategory(data.category);
       setImageQuery(data.image_query);
     };
@@ -209,8 +181,17 @@ const Post = () => {
         <textarea
           className="input"
           rows="18"
-          value={content}
+          value={addNewlineOnPeriod(content)}
           onChange={(e) => setContent(e.target.value)}
+        />
+      </div>
+      <div className="groupInput">
+        <h2>Caption</h2>
+        <textarea
+          className="input"
+          rows="18"
+          value={addNewlineOnPeriod(caption)}
+          onChange={(e) => setCaption(e.target.value)}
         />
       </div>
 
