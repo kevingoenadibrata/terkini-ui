@@ -3,9 +3,10 @@ import { useParams } from "react-router-dom";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
-import Canvas from "../../components/Canvas/Canvas";
-import CanvasContent from "../../components/CanvasContent/CanvasContent";
+import Canvas from "../../components/Canvas";
+import CanvasContent from "../../components/CanvasContent";
 import { addNewlineOnPeriod, fetchImages, fetchPost } from "./lib";
+import SuggestedImages from "./SuggestedImages";
 
 const Post = () => {
   const { postId } = useParams();
@@ -54,6 +55,11 @@ const Post = () => {
   useEffect(() => {
     const getImages = async () => {
       const images = await fetchImages(imageQuery);
+
+      if (!images) {
+        return;
+      }
+
       setSuggestedImages(images);
     };
 
@@ -151,34 +157,7 @@ const Post = () => {
           onChange={handleImageUpload}
         />
       </div>
-      {/* Suggested image section */}
-      <div className="groupInput">
-        <h2>Suggested Images</h2>
-        {/* Output suggested images */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          {suggestedImages.map((image, index) => (
-            <div
-              key={index}
-              style={{ margin: "10px", cursor: "pointer" }}
-              onClick={() => handleImageSelect(image)}
-            >
-              <img
-                src={image}
-                crossOrigin="anonymous"
-                alt="suggested"
-                width="200"
-                height="200"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
+      <SuggestedImages images={suggestedImages} onSelect={handleImageSelect} />
       <div className="groupInput">
         <h2>Title</h2>
         <textarea
