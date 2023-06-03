@@ -40,8 +40,8 @@ const Post = () => {
 
       // Set data according to fetched data
       setTitle(data.title);
-      setContent(data.content);
-      setCaption(data.caption);
+      setContent(addNewlineOnPeriod(data.content));
+      setCaption(addNewlineOnPeriod(data.caption));
       setCategory(data.category);
       setImageQuery(data.image_query);
     };
@@ -181,7 +181,7 @@ const Post = () => {
         <textarea
           className="input"
           rows="18"
-          value={addNewlineOnPeriod(content)}
+          value={content}
           onChange={(e) => setContent(e.target.value)}
         />
       </div>
@@ -190,7 +190,7 @@ const Post = () => {
         <textarea
           className="input"
           rows="18"
-          value={addNewlineOnPeriod(caption)}
+          value={caption}
           onChange={(e) => setCaption(e.target.value)}
         />
       </div>
