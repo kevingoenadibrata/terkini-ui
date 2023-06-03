@@ -20,6 +20,7 @@ const Post = () => {
   const [suggestedImages, setSuggestedImages] = useState([]);
   const [frame, setFrame] = useState(null);
   const [frame2, setFrame2] = useState(null);
+  const [copyMessage, setCopyMessage] = useState("");
   const [isContentButtonDisabled, setIsContentButtonDisabled] = useState(false);
   const [isTitleButtonDisabled, setIsTitleButtonDisabled] = useState(false);
 
@@ -118,6 +119,16 @@ const Post = () => {
     setImage(img);
   };
 
+  const handleCopyCaption = () => {
+    navigator.clipboard.writeText(caption);
+    setCopyMessage("Caption copied to clipboard!");
+
+    // Hide message after 5 seconds of showing
+    setTimeout(() => {
+      setCopyMessage("");
+    }, 5000);
+  };
+
   return (
     <>
       <h1>Instagram Post Generator</h1>
@@ -166,6 +177,11 @@ const Post = () => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+        {isTitleButtonDisabled && (
+          <p className="warning">
+            Your title is too long, please reduce to have less lines
+          </p>
+        )}
       </div>
       <div className="groupInput">
         <h2>Category</h2>
@@ -183,6 +199,19 @@ const Post = () => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
+        {isContentButtonDisabled && (
+          <p className="warning">
+            Your content is too long, please reduce to have less lines
+          </p>
+        )}
+      </div>
+      <div
+        className="groupInput"
+        style={{ display: "flex", flexDirection: "column" }}
+      >
+        <button disabled={isTitleButtonDisabled} onClick={handleDownload}>
+          Download Cover & Content
+        </button>
       </div>
       <div className="groupInput">
         <h2>Caption</h2>
@@ -193,23 +222,12 @@ const Post = () => {
           onChange={(e) => setCaption(e.target.value)}
         />
       </div>
-
-      <div className="groupInput">
-        <button disabled={isTitleButtonDisabled} onClick={handleDownload}>
-          Download Cover & Content
-        </button>
-      </div>
-      <div className="groupInput">
-        {isContentButtonDisabled && (
-          <p className="warning">
-            Your content is too long, please reduce to have less lines
-          </p>
-        )}
-        {isTitleButtonDisabled && (
-          <p className="warning">
-            Your title is too long, please reduce to have less lines
-          </p>
-        )}
+      <div
+        className="groupInput"
+        style={{ display: "flex", flexDirection: "column" }}
+      >
+        <button onClick={handleCopyCaption}>Copy Caption</button>
+        {copyMessage && <p style={{ marginTop: "8px" }}>{copyMessage}</p>}
       </div>
     </>
   );
