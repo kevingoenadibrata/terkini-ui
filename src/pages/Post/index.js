@@ -6,6 +6,10 @@ import { saveAs } from "file-saver";
 import Canvas from "../../components/Canvas";
 import CanvasContent from "../../components/CanvasContent";
 import endingImg from "../../components/CanvasContent/End Slide.png";
+
+import CoverImage from "../../components/Canvas/Cover.png";
+import Frame2Image from "../../components/CanvasContent/Frame2.png";
+
 import { addNewlineOnPeriod, fetchImages, fetchPost } from "./lib";
 import SuggestedImages from "./SuggestedImages";
 
@@ -18,6 +22,7 @@ const Post = () => {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState(null);
   const [imageQuery, setImageQuery] = useState("");
+
   const [suggestedImages, setSuggestedImages] = useState([]);
   const [frame, setFrame] = useState(null);
   const [frame2, setFrame2] = useState(null);
@@ -26,11 +31,11 @@ const Post = () => {
 
   useEffect(() => {
     const img = new Image();
-    img.src = require("../../components/Canvas/Cover.png");
+    img.src = CoverImage;
     setFrame(img);
 
     const img2 = new Image();
-    img2.src = require("../../components/CanvasContent/Frame2.png");
+    img2.src = Frame2Image;
     setFrame2(img2);
   }, []);
 
@@ -135,6 +140,16 @@ const Post = () => {
     }, 5000);
   };
 
+  const handleCopyImageQuery = () => {
+    navigator.clipboard.writeText(imageQuery);
+    setCopyMessage("Image query copied to clipboard!");
+
+    // Hide message after 5 seconds of showing
+    setTimeout(() => {
+      setCopyMessage("");
+    }, 5000);
+  };
+
   return (
     <>
       <h1>Instagram Post Generator</h1>
@@ -173,6 +188,22 @@ const Post = () => {
           name="imageLoader"
           onChange={handleImageUpload}
         />
+      </div>
+      <div className="groupInput">
+        <h2>Image Keywords</h2>
+        <textarea
+          className="input"
+          rows="4"
+          value={imageQuery}
+          onChange={(e) => setImageQuery(e.target.value)}
+        />
+      </div>
+      <div
+        className="groupInput"
+        style={{ display: "flex", flexDirection: "column" }}
+      >
+        <button onClick={handleCopyImageQuery}>Copy Keyword</button>
+        {copyMessage && <p style={{ marginTop: "8px" }}>{copyMessage}</p>}
       </div>
       <SuggestedImages images={suggestedImages} onSelect={handleImageSelect} />
       <div className="groupInput">
