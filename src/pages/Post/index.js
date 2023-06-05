@@ -5,6 +5,7 @@ import { saveAs } from "file-saver";
 
 import Canvas from "../../components/Canvas";
 import CanvasContent from "../../components/CanvasContent";
+import endingImg from "../../components/CanvasContent/End Slide.png";
 import { addNewlineOnPeriod, fetchImages, fetchPost } from "./lib";
 import SuggestedImages from "./SuggestedImages";
 
@@ -21,8 +22,7 @@ const Post = () => {
   const [frame, setFrame] = useState(null);
   const [frame2, setFrame2] = useState(null);
   const [copyMessage, setCopyMessage] = useState("");
-  const [isContentButtonDisabled, setIsContentButtonDisabled] = useState(false);
-  const [isTitleButtonDisabled, setIsTitleButtonDisabled] = useState(false);
+  const [isDownloadDisabled, setIsDownloadDisabled] = useState(false);
 
   useEffect(() => {
     const img = new Image();
@@ -87,28 +87,34 @@ const Post = () => {
   };
 
   const handleDownload = useCallback(async () => {
-    setIsTitleButtonDisabled(true);
-    setIsContentButtonDisabled(true);
+    setIsDownloadDisabled(true);
 
-    const zip = new JSZip();
-    const coverCanvas = document.getElementById("canvas-cover");
-    const contentCanvas = document.getElementById("canvas-content");
+    try {
+      const zip = new JSZip();
+      const coverCanvas = document.getElementById("canvas-cover");
+      const contentCanvas = document.getElementById("canvas-content");
 
-    const coverBlob = await new Promise((resolve) =>
-      coverCanvas.toBlob(resolve, "image/png")
-    );
-    const contentBlob = await new Promise((resolve) =>
-      contentCanvas.toBlob(resolve, "image/png")
-    );
+      const coverBlob = await new Promise((resolve) =>
+        coverCanvas.toBlob(resolve, "image/png")
+      );
+      const contentBlob = await new Promise((resolve) =>
+        contentCanvas.toBlob(resolve, "image/png")
+      );
 
-    zip.file("cover.png", coverBlob);
-    zip.file("content.png", contentBlob);
+      const endingImgBlob = await fetch(endingImg).then((res) => res.blob());
 
-    zip.generateAsync({ type: "blob" }).then((blob) => {
-      saveAs(blob, "download.zip");
-      setIsTitleButtonDisabled(false);
-      setIsContentButtonDisabled(false);
-    });
+      zip.file("1 Cover.png", coverBlob);
+      zip.file("2 Content.png", contentBlob);
+      zip.file("3 End Cover.png", endingImgBlob, { binary: true });
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+
+      saveAs(zipBlob, "download.zip");
+      setIsDownloadDisabled(false);
+    } catch (error) {
+      console.error("Failed to download zip file", error);
+      setIsDownloadDisabled(false);
+    }
   }, []);
 
   // Set selected image to state and prepare image for canvas
@@ -145,7 +151,7 @@ const Post = () => {
           contentCategory={category}
           contentImage={image}
           contentFrame={frame}
-          setIsTitleButtonDisabled={setIsTitleButtonDisabled}
+          setIsTitleButtonDisabled={setIsDownloadDisabled}
           width={1080}
           height={1080}
         />
@@ -153,7 +159,7 @@ const Post = () => {
           contentContent={content}
           contentCategory={category}
           contentFrame={frame2}
-          setIsContentButtonDisabled={setIsContentButtonDisabled}
+          setIsContentButtonDisabled={setIsDownloadDisabled}
           width={1080}
           height={1080}
         />
@@ -177,7 +183,7 @@ const Post = () => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        {isTitleButtonDisabled && (
+        {isDownloadDisabled && (
           <p className="warning">
             Your title is too long, please reduce to have less lines
           </p>
@@ -199,7 +205,7 @@ const Post = () => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
-        {isContentButtonDisabled && (
+        {isDownloadDisabled && (
           <p className="warning">
             Your content is too long, please reduce to have less lines
           </p>
@@ -209,7 +215,7 @@ const Post = () => {
         className="groupInput"
         style={{ display: "flex", flexDirection: "column" }}
       >
-        <button disabled={isTitleButtonDisabled} onClick={handleDownload}>
+        <button disabled={isDownloadDisabled} onClick={handleDownload}>
           Download Cover & Content
         </button>
       </div>
